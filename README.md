@@ -29,6 +29,38 @@ Uploading your image is so easy, it's practically cheating. Just drag and drop y
 ## ASCII Characters: They're just internet points, but for art
 
 ASCII art uses different characters to represent shades of gray. Think of it like this: dense characters like `#` or `@` are used for darker areas, while lighter characters like `.` or ` ` are used for brighter areas. The app automatically figures out the best characters to use to make your image look fire in ASCII. The more characters available, the more detailed the output can be, giving your meme that extra *oomph*.
+
+
+## Best Image Output
+Here's an example of the best image output from the app:
+     .                                       
+                                   +]\XQ0X{                                     
+                                 li10a8BB%Mm:                                   
+                                ")nk8$$%&B@&w.                                  
+                                :\\M@@Bj]J#%k^                                  
+                                I:tI@@]J#_#Bk^                                  
+                                ICn-?({ntt@Bh^                                  
+                               .i<l;>++-{v*Wa]                                  
+                                fkurruUCCJ#LLp!.                                
+                              .~pZi1L0Cz|_naXqw[.                               
+                             .?qo^:l_1(}+I"%B%Wbu.                              
+                           ..?w#""^":;I;:,":8&%8hL`                             
+                            )qo^^'''..'`^":;!kd#&om:                            
+                           {mU"'.       .'"IiiQLa&hQ< .                         
+                          1JOI'    ..    .`,>_!CcM&dY^.                         
+                         <cn\;.    ..    .'"i?]UJMB*Lt                          
+                         )Ct/l`    ...   .`,>[1QMBB#Q(                          
+                        .l|Qc?;'...''...'`"l-\tJh*hOvI                          
+                      .`_+_]/bL!,``^"^``",!?\[_-]}[[[(^.                        
+                   ,]--_____?(a8bi;::::;i_1jX{--???]]{/''                       
+                   I---???---](Z%O1]--]1/xzv%}?][}}}}}{};..                     
+                   "]-?][[[[]?[\zYzccczXYC%@8{[}{11111{)r>.                     
+                   l]?][}{{}}[[{tuW8BBBB%&W#}}[{1111)\x_I"'.                    
+                   '<[1|))11{}[}|v&hbddppb#M([[}{)\fUUr1+;^.                    
+                    .. .`,I-rjffcv}]?---_+~+{\|/xcpQu|]<l"'.                    
+                         .'`^",::,"^^`^```'`^;>++~>l;:^`'.                      
+                              ....           .'''''..                           
+                                                                                
 # FireBASED Studio
 
 This is a NextJS starter in Firebase Studio.
