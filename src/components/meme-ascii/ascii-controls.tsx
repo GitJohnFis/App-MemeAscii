@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from 'react'; 
-import { SlidersHorizontal, Wand2, Palette, Contrast, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, Wand2, Palette, Contrast, RotateCcw, Settings2, ContrastIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
@@ -9,8 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import type { AsciiCharset } from '@/lib/ascii-charsets';
-import { ASCII_CHARSETS, DEFAULT_CHARSET_KEY } from '@/lib/ascii-charsets';
+// import type { AsciiCharset } from '@/lib/ascii-charsets'; // Not directly used
+import { ASCII_CHARSETS } from '@/lib/ascii-charsets'; // Removed DEFAULT_CHARSET_KEY as it's managed by page
 
 export interface AsciiSettings {
   outputWidth: number;
@@ -24,31 +24,30 @@ interface AsciiControlsProps {
   onSettingsChange: (settings: AsciiSettings) => void;
   onEnhanceWithAI: () => void;
   isEnhancing?: boolean;
-  isImageUploaded: boolean;
+  isImageUploaded: boolean; // This prop indicates if an image is contextually available
 }
 
-const DEFAULT_OUTPUT_WIDTH = 100;
-const DEFAULT_CONTRAST = 1.0;
-const DEFAULT_INVERT_COLORS = true;
-
+// Removed default values as they should be managed by the parent page (MemeAsciiPage)
 
 export function AsciiControls({
   initialSettings,
   onSettingsChange,
   onEnhanceWithAI,
   isEnhancing = false,
-  isImageUploaded,
+  isImageUploaded, // True if either a file is uploaded or loaded from history (currentImageBase64 is set)
 }: AsciiControlsProps) {
   const [outputWidth, setOutputWidth] = React.useState(initialSettings.outputWidth);
   const [charsetKey, setCharsetKey] = React.useState(initialSettings.charsetKey);
   const [invertColors, setInvertColors] = React.useState(initialSettings.invertColors);
   const [contrast, setContrast] = React.useState(initialSettings.contrast);
 
+  // Effect to propagate changes upwards
   React.useEffect(() => {
     onSettingsChange({ outputWidth, charsetKey, invertColors, contrast });
   }, [outputWidth, charsetKey, invertColors, contrast, onSettingsChange]);
   
-  React.useEffect(() => { // Update local state if initialSettings prop values change
+  // Effect to sync with `initialSettings` if they change externally (e.g., loading from history)
+  React.useEffect(() => { 
     setOutputWidth(initialSettings.outputWidth);
     setCharsetKey(initialSettings.charsetKey);
     setInvertColors(initialSettings.invertColors);
@@ -60,6 +59,8 @@ export function AsciiControls({
     initialSettings.contrast
   ]);
 
+
+  const controlsDisabled = !isImageUploaded || isEnhancing;
 
   return (
     <Card className="shadow-lg">
@@ -74,7 +75,7 @@ export function AsciiControls({
         <TooltipProvider>
           <div className="space-y-2">
             <Label htmlFor="output-width" className="flex items-center gap-1">
-              Output Width (Density)
+              <Settings2 size={14} className="mr-1 text-muted-foreground" /> Output Width (Density)
               <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
                 <TooltipContent><p>Controls the number of characters in width. Lower values can be less detailed but faster.</p></TooltipContent>
@@ -88,7 +89,7 @@ export function AsciiControls({
                 step={10}
                 value={[outputWidth]}
                 onValueChange={(value) => setOutputWidth(value[0])}
-                disabled={!isImageUploaded || isEnhancing}
+                disabled={controlsDisabled}
                 className="flex-grow"
               />
               <span className="text-sm text-muted-foreground w-12 text-right">{outputWidth} chars</span>
@@ -97,16 +98,16 @@ export function AsciiControls({
 
           <div className="space-y-2">
             <Label htmlFor="charset" className="flex items-center gap-1">
-              Character Set
+               <Palette size={14} className="mr-1 text-muted-foreground" /> Character Set
                <Tooltip>
-                <TooltipTrigger asChild><Palette size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
+                <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
                 <TooltipContent><p>Different sets of characters produce different visual styles.</p></TooltipContent>
               </Tooltip>
             </Label>
             <Select
               value={charsetKey}
               onValueChange={setCharsetKey}
-              disabled={!isImageUploaded || isEnhancing}
+              disabled={controlsDisabled}
             >
               <SelectTrigger id="charset">
                 <SelectValue placeholder="Select character set" />
@@ -126,9 +127,9 @@ export function AsciiControls({
 
           <div className="space-y-2">
             <Label htmlFor="contrast" className="flex items-center gap-1">
-              Contrast
+              <ContrastIcon size={14} className="mr-1 text-muted-foreground" /> Contrast
               <Tooltip>
-                <TooltipTrigger asChild><Contrast size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
+                <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
                 <TooltipContent><p>Adjust image contrast before ASCII conversion. (1.0 is original)</p></TooltipContent>
               </Tooltip>
             </Label>
@@ -140,7 +141,7 @@ export function AsciiControls({
                 step={0.1}
                 value={[contrast]}
                 onValueChange={(value) => setContrast(value[0])}
-                disabled={!isImageUploaded || isEnhancing}
+                disabled={controlsDisabled}
               />
               <span className="text-sm text-muted-foreground w-12 text-right">{contrast.toFixed(1)}x</span>
             </div>
@@ -148,7 +149,7 @@ export function AsciiControls({
           
           <div className="flex items-center justify-between">
             <Label htmlFor="invert-colors" className="flex items-center gap-1">
-              Invert Colors
+              <RotateCcw size={14} className="mr-1 text-muted-foreground" /> Invert Colors
               <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
                 <TooltipContent><p>Inverts brightness mapping. Useful for light text on dark background effect from dark-subject images.</p></TooltipContent>
@@ -158,13 +159,13 @@ export function AsciiControls({
               id="invert-colors"
               checked={invertColors}
               onCheckedChange={setInvertColors}
-              disabled={!isImageUploaded || isEnhancing}
+              disabled={controlsDisabled}
             />
           </div>
         </TooltipProvider>
         <Button
           onClick={onEnhanceWithAI}
-          disabled={!isImageUploaded || isEnhancing}
+          disabled={controlsDisabled} // AI enhancement should also be disabled if no image or enhancing
           className="w-full transition-all duration-300 ease-in-out transform hover:scale-105"
           size="lg"
         >

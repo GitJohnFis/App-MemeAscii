@@ -5,7 +5,8 @@ import { ImageUploader } from '@/components/meme-ascii/image-uploader';
 import { AsciiControls, type AsciiSettings } from '@/components/meme-ascii/ascii-controls';
 import { AsciiPreview } from '@/components/meme-ascii/ascii-preview';
 import { ActionButtons } from '@/components/meme-ascii/action-buttons';
-import { convertImageFileToAscii } from '@/lib/ascii-utils';
+import { AsciiHistory, type AsciiHistoryEntry } from '@/components/meme-ascii/ascii-history';
+import { convertImageFileToAscii, fileToDataURL } from '@/lib/ascii-utils';
 import { enhanceAsciiMeme, type EnhanceAsciiMemeInput } from '@/ai/flows/enhance-ascii-meme';
 import { DEFAULT_CHARSET_KEY } from '@/lib/ascii-charsets';
 import { useToast } from "@/hooks/use-toast";
@@ -19,9 +20,12 @@ const INITIAL_SETTINGS: AsciiSettings = {
   contrast: 1.0,
 };
 
+const MAX_HISTORY_ITEMS = 5;
+
 export default function MemeAsciiPage() {
   const [uploadedImageFile, setUploadedImageFile] = React.useState<File | null>(null);
   const [uploadedImagePreviewUrl, setUploadedImagePreviewUrl] = React.useState<string | null>(null);
+  const [currentImageBase64, setCurrentImageBase64] = React.useState<string | null>(null);
   
   const [asciiSettings, setAsciiSettings] = React.useState<AsciiSettings>(INITIAL_SETTINGS);
   const [currentAsciiArt, setCurrentAsciiArt] = React.useState<string | null>(null);
@@ -30,9 +34,24 @@ export default function MemeAsciiPage() {
   const [isAiLoading, setIsAiLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
+  const [asciiHistory, setAsciiHistory] = React.useState<AsciiHistoryEntry[]>([]);
+
   const { toast } = useToast();
 
-  const generateClientAscii = React.useCallback(async (file: File, settings: AsciiSettings) => {
+  const addHistoryEntry = React.useCallback((art: string, settings: AsciiSettings, imageBase64: string | null) => {
+    if (!imageBase64) return;
+    const newEntry: AsciiHistoryEntry = {
+      id: Date.now().toString(),
+      timestamp: Date.now(),
+      imageBase64: imageBase64,
+      asciiArt: art,
+      settings: { ...settings }, // Ensure a copy of settings is stored
+    };
+    setAsciiHistory(prev => [newEntry, ...prev].slice(0, MAX_HISTORY_ITEMS));
+  }, []);
+
+
+  const generateClientAscii = React.useCallback(async (file: File, settings: AsciiSettings, imageBase64ForHistory: string | null) => {
     if (!file) return;
     setIsClientLoading(true);
     setError(null);
@@ -44,6 +63,9 @@ export default function MemeAsciiPage() {
         contrast: settings.contrast,
       });
       setCurrentAsciiArt(art);
+      if (art && imageBase64ForHistory) {
+        addHistoryEntry(art, settings, imageBase64ForHistory);
+      }
     } catch (err) {
       console.error("Client ASCII generation error:", err);
       const errorMessage = err instanceof Error ? err.message : "Failed to generate ASCII art.";
@@ -53,23 +75,34 @@ export default function MemeAsciiPage() {
     } finally {
       setIsClientLoading(false);
     }
-  }, [toast]);
+  }, [toast, addHistoryEntry]);
 
   React.useEffect(() => {
-    if (uploadedImageFile) {
-      generateClientAscii(uploadedImageFile, asciiSettings);
+    if (uploadedImageFile && currentImageBase64) {
+      generateClientAscii(uploadedImageFile, asciiSettings, currentImageBase64);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedImageFile, asciiSettings, generateClientAscii]); 
+  }, [uploadedImageFile, asciiSettings, currentImageBase64]); // Removed generateClientAscii from deps as it uses useCallback
 
-  const handleImageUpload = (file: File) => {
+  const handleImageUpload = async (file: File) => {
     setUploadedImageFile(file);
     if (uploadedImagePreviewUrl) {
       URL.revokeObjectURL(uploadedImagePreviewUrl);
     }
-    setUploadedImagePreviewUrl(URL.createObjectURL(file));
+    const previewUrl = URL.createObjectURL(file);
+    setUploadedImagePreviewUrl(previewUrl);
     setCurrentAsciiArt(null); 
     setError(null);
+
+    try {
+      const base64 = await fileToDataURL(file);
+      setCurrentImageBase64(base64);
+      // Initial generation will be triggered by useEffect watching currentImageBase64
+    } catch (err) {
+      console.error("Error converting file to Data URL:", err);
+      toast({ title: "Image Processing Error", description: "Could not process the uploaded image.", variant: "destructive" });
+      setCurrentImageBase64(null);
+    }
   };
 
   const handleSettingsChange = React.useCallback((newSettings: AsciiSettings) => {
@@ -82,12 +115,19 @@ export default function MemeAsciiPage() {
       toast({ title: "Enhancement Error", description: "No ASCII art available to enhance.", variant: "destructive" });
       return;
     }
+    if (!currentImageBase64) {
+      setError("Original image data is missing for history. Please re-upload.");
+      toast({ title: "Enhancement Error", description: "Original image data is missing.", variant: "destructive" });
+      return;
+    }
+
     setIsAiLoading(true);
     setError(null);
     try {
       const input: EnhanceAsciiMemeInput = { asciiArt: currentAsciiArt };
       const result = await enhanceAsciiMeme(input);
       setCurrentAsciiArt(result.enhancedAsciiArt);
+      addHistoryEntry(result.enhancedAsciiArt, asciiSettings, currentImageBase64);
       toast({ title: "AI Enhancement Successful!", description: "Your ASCII meme has been enhanced.", variant: "default" });
     } catch (err) {
       console.error("AI enhancement error:", err);
@@ -99,9 +139,23 @@ export default function MemeAsciiPage() {
     }
   };
 
+  const handleLoadFromHistory = (entry: AsciiHistoryEntry) => {
+    setCurrentAsciiArt(entry.asciiArt);
+    setAsciiSettings(entry.settings);
+    setUploadedImagePreviewUrl(entry.imageBase64); // Show the image from history
+    setCurrentImageBase64(entry.imageBase64); // Set current base64 for potential re-enhancement
+    setUploadedImageFile(null); // Clear the File object as we're loading a stored state
+    toast({ title: "Loaded from History", description: "ASCII art and settings have been restored." });
+  };
+
+  const handleDeleteFromHistory = (id: string) => {
+    setAsciiHistory(prev => prev.filter(item => item.id !== id));
+    toast({ title: "History Entry Deleted" });
+  };
+
   React.useEffect(() => {
     return () => {
-      if (uploadedImagePreviewUrl) {
+      if (uploadedImagePreviewUrl && uploadedImagePreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(uploadedImagePreviewUrl);
       }
     };
@@ -129,7 +183,7 @@ export default function MemeAsciiPage() {
 
         <ImageUploader 
           onImageUpload={handleImageUpload} 
-          isLoading={isClientLoading} 
+          isLoading={isClientLoading || isAiLoading} 
           uploadedImagePreviewUrl={uploadedImagePreviewUrl}
         />
 
@@ -140,9 +194,14 @@ export default function MemeAsciiPage() {
               onSettingsChange={handleSettingsChange}
               onEnhanceWithAI={handleEnhanceWithAI}
               isEnhancing={isAiLoading}
-              isImageUploaded={!!uploadedImageFile}
+              isImageUploaded={!!uploadedImageFile || !!currentImageBase64}
             />
             <ActionButtons asciiArt={currentAsciiArt} fileName="meme-ascii.txt" />
+            <AsciiHistory
+              history={asciiHistory}
+              onLoadFromHistory={handleLoadFromHistory}
+              onDeleteFromHistory={handleDeleteFromHistory}
+            />
           </div>
           <div className="md:col-span-2">
             <AsciiPreview 

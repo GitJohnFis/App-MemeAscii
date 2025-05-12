@@ -1,3 +1,4 @@
+
 import type { AsciiCharset } from './ascii-charsets';
 import { ASCII_CHARSETS, DEFAULT_CHARSET_KEY } from './ascii-charsets';
 
@@ -119,3 +120,13 @@ export async function convertImageFileToAscii(
     reader.readAsDataURL(file);
   });
 }
+
+
+export const fileToDataURL = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+};
