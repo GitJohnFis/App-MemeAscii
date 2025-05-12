@@ -33,6 +33,7 @@ ASCII art uses different characters to represent shades of gray. Think of it lik
 
 ## Best Image Output
 Here's an example of the best image output from the app:
+```
      .                                       
                                    +]\XQ0X{                                     
                                  li10a8BB%Mm:                                   
@@ -60,7 +61,7 @@ Here's an example of the best image output from the app:
                     .. .`,I-rjffcv}]?---_+~+{\|/xcpQu|]<l"'.                    
                          .'`^",::,"^^`^```'`^;>++~>l;:^`'.                      
                               ....           .'''''..                           
-                                                                                
+```                                                
 # FireBASED Studio
 
 This is a NextJS starter in Firebase Studio.
