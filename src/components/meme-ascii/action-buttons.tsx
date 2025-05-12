@@ -65,7 +65,7 @@ export function ActionButtons({ asciiArt, fileName = "meme-ascii.txt" }: ActionB
   };
 
 
-  constisDisabled = !asciiArt;
+  const isDisabled = !asciiArt;
 
   return (
     <Card className="shadow-lg">
@@ -84,11 +84,11 @@ export function ActionButtons({ asciiArt, fileName = "meme-ascii.txt" }: ActionB
           <Copy className="mr-2 h-4 w-4" />
           Copy to Clipboard
         </Button>
-         <Button onClick={handleShare} variant="outline" disabled={isDisabled || !navigator.share} className="w-full">
+         <Button onClick={handleShare} variant="outline" disabled={isDisabled || typeof navigator !== 'undefined' && !navigator.share} className="w-full">
           <Share2 className="mr-2 h-4 w-4" />
           Share
         </Button>
-        {!navigator.share && !isDisabled && (
+        {typeof navigator !== 'undefined' && !navigator.share && !isDisabled && (
           <p className="text-xs text-muted-foreground text-center">Web Share API not supported. "Share" will copy to clipboard.</p>
         )}
       </CardContent>

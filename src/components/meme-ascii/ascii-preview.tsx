@@ -1,7 +1,7 @@
 "use client";
 
-import type * as React from 'react';
-import { Eye, Loader2 } from 'lucide-react';
+import * as React from 'react';
+import { Eye, Loader2, Image as ImageIcon } from 'lucide-react'; // Added ImageIcon
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
