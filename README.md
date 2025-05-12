@@ -6,8 +6,9 @@ __  __ ______ __  __ ______
 | |\ | | |___|| |\ | | |___
 |_| \|_|_____||_| \|_|_____|
 
-- made in **MemeAscii**
+
 ```
+-- made in **MemeAscii**
 
 
 This app is peak for turning your favorite pics into ASCII memes. Here's how to get started and flex your creative muscles:
