@@ -12,6 +12,7 @@ import { enhanceAsciiMeme, type EnhanceAsciiMemeInput } from '@/ai/flows/enhance
 import { DEFAULT_CHARSET_KEY } from '@/lib/ascii-charsets';
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Terminal } from "lucide-react";
 
 const INITIAL_SETTINGS: AsciiSettings = {
@@ -21,7 +22,7 @@ const INITIAL_SETTINGS: AsciiSettings = {
   contrast: 1.0,
 };
 
-const MAX_HISTORY_ITEMS = 10; // Increased history items
+const MAX_HISTORY_ITEMS = 10; 
 
 export default function MemeAsciiPage() {
   const [uploadedImageFile, setUploadedImageFile] = React.useState<File | null>(null);
@@ -87,7 +88,7 @@ export default function MemeAsciiPage() {
 
   const handleImageUpload = async (file: File) => {
     setUploadedImageFile(file);
-    if (uploadedImagePreviewUrl) {
+    if (uploadedImagePreviewUrl && uploadedImagePreviewUrl.startsWith('blob:')) {
       URL.revokeObjectURL(uploadedImagePreviewUrl);
     }
     const previewUrl = URL.createObjectURL(file);
@@ -142,9 +143,17 @@ export default function MemeAsciiPage() {
   const handleLoadFromHistory = (entry: AsciiHistoryEntry) => {
     setCurrentAsciiArt(entry.asciiArt);
     setAsciiSettings(entry.settings);
+    
+    // Create a synthetic File object if needed by generateClientAscii or other functions
+    // For now, we only need base64 for preview and history, so direct set is fine.
     setUploadedImagePreviewUrl(entry.imageBase64); 
     setCurrentImageBase64(entry.imageBase64); 
+    
+    // If we need to re-enable client-side generation with history items,
+    // we'd need to convert base64 back to File or adjust generateClientAscii.
+    // For now, setting uploadedImageFile to null as we're loading from base64.
     setUploadedImageFile(null); 
+    
     toast({ title: "Loaded from History", description: "ASCII art and settings have been restored." });
   };
 
@@ -154,6 +163,7 @@ export default function MemeAsciiPage() {
   };
 
   React.useEffect(() => {
+    // Cleanup for blob URLs
     return () => {
       if (uploadedImagePreviewUrl && uploadedImagePreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(uploadedImagePreviewUrl);
@@ -165,7 +175,16 @@ export default function MemeAsciiPage() {
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="p-6 border-b border-border shadow-md">
         <div className="container mx-auto">
-          <h1 className="text-4xl font-bold text-primary tracking-tight">MemeAscii</h1>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h1 className="text-4xl font-bold text-primary tracking-tight">MemeAscii</h1>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>MemeAscii: AI Powered ASCII Art Memes</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <p className="text-lg text-muted-foreground mt-1">
             Craft hilarious, AI-powered ASCII memes from your images.
           </p>
@@ -194,7 +213,7 @@ export default function MemeAsciiPage() {
               onSettingsChange={handleSettingsChange}
               onEnhanceWithAI={handleEnhanceWithAI}
               isEnhancing={isAiLoading}
-              isImageUploaded={!!uploadedImageFile || !!currentImageBase64}
+              isImageUploaded={!!currentImageBase64} // Ensure controls are enabled if image loaded from history
             />
             <ActionButtons asciiArt={currentAsciiArt} fileName="meme-ascii.txt" />
           </div>
@@ -205,7 +224,7 @@ export default function MemeAsciiPage() {
               isLoadingClient={isClientLoading}
               className="min-h-[500px] md:min-h-0"
             />
-            <AsciiHistory
+             <AsciiHistory
               history={asciiHistory}
               onLoadFromHistory={handleLoadFromHistory}
               onDeleteFromHistory={handleDeleteFromHistory}
