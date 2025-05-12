@@ -7,6 +7,8 @@ import { Toaster } from "@/components/ui/toaster";
 
 // No need to call GeistSans or GeistMono as functions,
 // they are objects with `variable` and `className` properties.
+// The `font-sans` class in `globals.css` (via Tailwind base) will use the CSS variables
+// provided by GeistSans.variable and GeistMono.variable, which are applied to the body tag.
 
 export const metadata: Metadata = {
   title: 'MemeAscii - AI Powered ASCII Art Memes',
@@ -19,12 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark"> {/* Set dark mode globally for consistency with theme */}
-      {/*
-        Use GeistSans.variable and GeistMono.variable directly.
-        These properties provide the CSS variable names (e.g., '--font-geist-sans').
-        The `font-sans` class in `globals.css` (via Tailwind base) will then use this variable.
-      */}
+    <html lang="en" className="dark">
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         {children}
         <Toaster />
@@ -32,3 +29,4 @@ export default function RootLayout({
     </html>
   );
 }
+
