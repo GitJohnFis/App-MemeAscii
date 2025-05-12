@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react';
@@ -20,7 +21,7 @@ const INITIAL_SETTINGS: AsciiSettings = {
   contrast: 1.0,
 };
 
-const MAX_HISTORY_ITEMS = 5;
+const MAX_HISTORY_ITEMS = 10; // Increased history items
 
 export default function MemeAsciiPage() {
   const [uploadedImageFile, setUploadedImageFile] = React.useState<File | null>(null);
@@ -45,7 +46,7 @@ export default function MemeAsciiPage() {
       timestamp: Date.now(),
       imageBase64: imageBase64,
       asciiArt: art,
-      settings: { ...settings }, // Ensure a copy of settings is stored
+      settings: { ...settings }, 
     };
     setAsciiHistory(prev => [newEntry, ...prev].slice(0, MAX_HISTORY_ITEMS));
   }, []);
@@ -82,7 +83,7 @@ export default function MemeAsciiPage() {
       generateClientAscii(uploadedImageFile, asciiSettings, currentImageBase64);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedImageFile, asciiSettings, currentImageBase64]); // Removed generateClientAscii from deps as it uses useCallback
+  }, [uploadedImageFile, asciiSettings, currentImageBase64]); 
 
   const handleImageUpload = async (file: File) => {
     setUploadedImageFile(file);
@@ -97,7 +98,6 @@ export default function MemeAsciiPage() {
     try {
       const base64 = await fileToDataURL(file);
       setCurrentImageBase64(base64);
-      // Initial generation will be triggered by useEffect watching currentImageBase64
     } catch (err) {
       console.error("Error converting file to Data URL:", err);
       toast({ title: "Image Processing Error", description: "Could not process the uploaded image.", variant: "destructive" });
@@ -142,9 +142,9 @@ export default function MemeAsciiPage() {
   const handleLoadFromHistory = (entry: AsciiHistoryEntry) => {
     setCurrentAsciiArt(entry.asciiArt);
     setAsciiSettings(entry.settings);
-    setUploadedImagePreviewUrl(entry.imageBase64); // Show the image from history
-    setCurrentImageBase64(entry.imageBase64); // Set current base64 for potential re-enhancement
-    setUploadedImageFile(null); // Clear the File object as we're loading a stored state
+    setUploadedImagePreviewUrl(entry.imageBase64); 
+    setCurrentImageBase64(entry.imageBase64); 
+    setUploadedImageFile(null); 
     toast({ title: "Loaded from History", description: "ASCII art and settings have been restored." });
   };
 
@@ -197,18 +197,18 @@ export default function MemeAsciiPage() {
               isImageUploaded={!!uploadedImageFile || !!currentImageBase64}
             />
             <ActionButtons asciiArt={currentAsciiArt} fileName="meme-ascii.txt" />
-            <AsciiHistory
-              history={asciiHistory}
-              onLoadFromHistory={handleLoadFromHistory}
-              onDeleteFromHistory={handleDeleteFromHistory}
-            />
           </div>
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 flex flex-col space-y-8">
             <AsciiPreview 
               asciiArt={currentAsciiArt} 
               isLoadingAi={isAiLoading}
               isLoadingClient={isClientLoading}
               className="min-h-[500px] md:min-h-0"
+            />
+            <AsciiHistory
+              history={asciiHistory}
+              onLoadFromHistory={handleLoadFromHistory}
+              onDeleteFromHistory={handleDeleteFromHistory}
             />
           </div>
         </div>
