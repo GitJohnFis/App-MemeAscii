@@ -49,10 +49,19 @@ export function AsciiPreview({ asciiArt, isLoadingAi, isLoadingClient, className
   return (
     <Card className={`shadow-lg h-full flex flex-col ${className}`}>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl">
-          <Eye className="text-primary" size={28} />
-          ASCII Preview
-        </CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Eye className="text-primary" size={28} />
+                ASCII Preview
+              </CardTitle>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>This area displays the generated ASCII art. You can scroll if the art is large.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <CardDescription>Your generated ASCII art will appear here.</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow flex items-center justify-center p-2 md:p-4 bg-card-foreground/5 rounded-b-lg relative"> {/* Added relative */}
@@ -99,7 +108,7 @@ export function AsciiPreview({ asciiArt, isLoadingAi, isLoadingClient, className
                   <Copy className="h-4 w-4 text-foreground" />
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="left">
+              <TooltipContent side="bottom">
                 <p>Copy ASCII art</p>
               </TooltipContent>
             </Tooltip>

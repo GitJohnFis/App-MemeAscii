@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from 'react'; 
@@ -65,10 +66,19 @@ export function AsciiControls({
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-xl">
-          <SlidersHorizontal className="text-primary" size={28} />
-          Customize Your ASCII
-        </CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <SlidersHorizontal className="text-primary" size={28} />
+                Customize Your ASCII
+              </CardTitle>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p>Adjust settings to change how the ASCII art is generated.</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         <CardDescription>Fine-tune the appearance of your ASCII art.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -78,7 +88,7 @@ export function AsciiControls({
               <Settings2 size={14} className="mr-1 text-muted-foreground" /> Output Width (Density)
               <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
-                <TooltipContent><p>Controls the number of characters in width. Lower values can be less detailed but faster.</p></TooltipContent>
+                <TooltipContent side="bottom"><p>Controls the number of characters in width. Lower values can be less detailed but faster.</p></TooltipContent>
               </Tooltip>
             </Label>
             <div className="flex items-center gap-4">
@@ -101,7 +111,7 @@ export function AsciiControls({
                <Palette size={14} className="mr-1 text-muted-foreground" /> Character Set
                <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
-                <TooltipContent><p>Different sets of characters produce different visual styles.</p></TooltipContent>
+                <TooltipContent side="bottom"><p>Different sets of characters produce different visual styles.</p></TooltipContent>
               </Tooltip>
             </Label>
             <Select
@@ -130,7 +140,7 @@ export function AsciiControls({
               <ContrastIcon size={14} className="mr-1 text-muted-foreground" /> Contrast
               <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
-                <TooltipContent><p>Adjust image contrast before ASCII conversion. (1.0 is original)</p></TooltipContent>
+                <TooltipContent side="bottom"><p>Adjust image contrast before ASCII conversion. (1.0 is original)</p></TooltipContent>
               </Tooltip>
             </Label>
              <div className="flex items-center gap-4">
@@ -152,7 +162,7 @@ export function AsciiControls({
               <RotateCcw size={14} className="mr-1 text-muted-foreground" /> Invert Colors
               <Tooltip>
                 <TooltipTrigger asChild><RotateCcw size={14} className="cursor-help text-muted-foreground" /></TooltipTrigger>
-                <TooltipContent><p>Inverts brightness mapping. Useful for light text on dark background effect from dark-subject images.</p></TooltipContent>
+                <TooltipContent side="bottom"><p>Inverts brightness mapping. Useful for light text on dark background effect from dark-subject images.</p></TooltipContent>
               </Tooltip>
             </Label>
             <Switch
