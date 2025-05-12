@@ -1,9 +1,11 @@
 # MemeAscii: Be so sigma and turn images into fire ASCII art
+```
 __  __ ______ __  __ ______
 |  \/  | ____||  \/  | ____|
 | \  / | ____|| \  / | ____|
 | |\ | | |___|| |\ | | |___
-|_| \|_|_____||_| \|_|_____| 
+|_| \|_|_____||_| \|_|_____|
+```
 - made in **MemeAscii**
 
 This app is peak for turning your favorite pics into ASCII memes. Here's how to get started and flex your creative muscles:
