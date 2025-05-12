@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from 'react'; // Added missing React import
+import * as React from 'react'; 
 import { SlidersHorizontal, Wand2, Palette, Contrast, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -48,12 +48,17 @@ export function AsciiControls({
     onSettingsChange({ outputWidth, charsetKey, invertColors, contrast });
   }, [outputWidth, charsetKey, invertColors, contrast, onSettingsChange]);
   
-  React.useEffect(() => { // Update local state if initialSettings prop changes
+  React.useEffect(() => { // Update local state if initialSettings prop values change
     setOutputWidth(initialSettings.outputWidth);
     setCharsetKey(initialSettings.charsetKey);
     setInvertColors(initialSettings.invertColors);
     setContrast(initialSettings.contrast);
-  }, [initialSettings]);
+  }, [
+    initialSettings.outputWidth, 
+    initialSettings.charsetKey, 
+    initialSettings.invertColors, 
+    initialSettings.contrast
+  ]);
 
 
   return (

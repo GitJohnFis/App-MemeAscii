@@ -60,7 +60,7 @@ export default function MemeAsciiPage() {
       generateClientAscii(uploadedImageFile, asciiSettings);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uploadedImageFile, asciiSettings, generateClientAscii]); // generateClientAscii is memoized
+  }, [uploadedImageFile, asciiSettings, generateClientAscii]); 
 
   const handleImageUpload = (file: File) => {
     setUploadedImageFile(file);
@@ -68,14 +68,13 @@ export default function MemeAsciiPage() {
       URL.revokeObjectURL(uploadedImagePreviewUrl);
     }
     setUploadedImagePreviewUrl(URL.createObjectURL(file));
-    setCurrentAsciiArt(null); // Clear previous art
+    setCurrentAsciiArt(null); 
     setError(null);
   };
 
-  const handleSettingsChange = (newSettings: AsciiSettings) => {
+  const handleSettingsChange = React.useCallback((newSettings: AsciiSettings) => {
     setAsciiSettings(newSettings);
-    // ASCII art will re-generate via useEffect if uploadedImageFile exists
-  };
+  }, []);
 
   const handleEnhanceWithAI = async () => {
     if (!currentAsciiArt) {
@@ -101,7 +100,6 @@ export default function MemeAsciiPage() {
   };
 
   React.useEffect(() => {
-    // Cleanup object URL on component unmount
     return () => {
       if (uploadedImagePreviewUrl) {
         URL.revokeObjectURL(uploadedImagePreviewUrl);
@@ -138,7 +136,7 @@ export default function MemeAsciiPage() {
         <div className="grid md:grid-cols-3 gap-8 items-start">
           <div className="md:col-span-1 flex flex-col space-y-8">
             <AsciiControls
-              initialSettings={INITIAL_SETTINGS}
+              initialSettings={asciiSettings}
               onSettingsChange={handleSettingsChange}
               onEnhanceWithAI={handleEnhanceWithAI}
               isEnhancing={isAiLoading}
@@ -151,7 +149,7 @@ export default function MemeAsciiPage() {
               asciiArt={currentAsciiArt} 
               isLoadingAi={isAiLoading}
               isLoadingClient={isClientLoading}
-              className="min-h-[500px] md:min-h-0" // Ensure preview has good height
+              className="min-h-[500px] md:min-h-0"
             />
           </div>
         </div>
