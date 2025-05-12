@@ -1,4 +1,9 @@
 # MemeAscii: Be so sigma and turn images into fire ASCII art
+<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">
+  <text x="20" y="60" font-family="Arial, sans-serif" font-size="48" fill="#FFD700">
+    MemeAscii Art
+  </text>
+</svg>
 ```
 __  __ ______ __  __ ______
 |  \/  | ____||  \/  | ____|
